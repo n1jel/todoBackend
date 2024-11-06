@@ -4,7 +4,7 @@ const todoSchema = new mongoose.Schema(
     {
         name: { type: String, required: true },
         description: { type: String, required: true },
-        isCompleted: { type: String, required: true, default: '0' },
+        isCompleted: { type: String, enum: ['0', '1', '2'], required: true, default: '0' },
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     },
     {

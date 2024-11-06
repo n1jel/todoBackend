@@ -1,4 +1,4 @@
-import { todoCreateController, todoGetAllSelfController, todoGetByIdController, todoUpdateController } from "controllers/todo.controller";
+import { todoCreateController, todoDeleteController, todoGetAllSelfController, todoGetByIdController, todoUpdateController } from "controllers/todo.controller";
 import { Router } from "express";
 import { tokenValidator } from "middleware/auth.middleware";
 import { todoCreateDataCheck, todoIdCheck } from "middleware/todos.middleware";
@@ -12,3 +12,5 @@ todosRoutes.get('/all/self', tokenValidator, todoGetAllSelfController);
 todosRoutes.get('/:id', tokenValidator, todoIdCheck, todoGetByIdController);
 
 todosRoutes.patch('/:id', tokenValidator, todoIdCheck, todoUpdateController);
+
+todosRoutes.delete('/:id', tokenValidator, todoIdCheck, todoDeleteController);

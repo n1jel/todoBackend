@@ -5,56 +5,76 @@ import { errorResponse } from "utils/apiResponse.util";
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { envVars } from "config/envVars.config";
+import appError from "config/apperror.config";
+import { StatusCodes } from "http-status-codes";
 
 export const registerUserMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const validation = userSchemaZod.safeParse(req.body);
-    if (validation.error) {
-        errorResponse(res, 400, validation.error.errors[0].message);
-        return;
+    try {
+        const validation = userSchemaZod.safeParse(req.body);
+        if (validation.error) {
+            next(validation.error);
+            return;
+        }
+        res.locals.user = validation.data;
+        next();
+    } catch (e) {
+        next(e);
     }
-    res.locals.user = validation.data;
-    next();
 }
 
 export const loginUserMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const validation = userLoginSchemaZod.safeParse(req.body);
-    if (validation.error) {
-        errorResponse(res, 400, validation.error.errors[0].message);
-        return;
+    try {
+        const validation = userLoginSchemaZod.safeParse(req.body);
+        if (validation.error) {
+            next(validation.error);
+            return;
+        }
+        next();
+    } catch (e) {
+        next(e);
     }
-    next();
 }
 
 export const userAlreadyExistsMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    const user = await User.findOne({ username: req.body.username });
-    if (user) {
-        errorResponse(res, 400, 'Username already exists');
-        return;
+    try {
+        const user = await User.findOne({ username: req.body.username });
+        if (user) {
+            throw appError(StatusCodes.BAD_REQUEST, 'Username already exists')
+        }
+        next();
+    } catch (e) {
+        next(e)
     }
-    next();
 }
 
 export const doesUserExistMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    let user = await User.findOne({ username: req.body.username });
+    try {
+        let user = await User.findOne({ username: req.body.username });
 
-    if (!user) {
-        errorResponse(res, 401, 'User not found');
-        return;
+        if (!user) {
+            throw appError(StatusCodes.UNAUTHORIZED, 'User not found');
+        }
+        res.locals.user = user;
+        next();
+    } catch (e) {
+        next(e);
     }
-    res.locals.user = user;
-    next();
+
 }
 
 export const isPasswordValidMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    const userInDb = res.locals.user
-    const loginCred = req.body;
+    try {
+        const userInDb = res.locals.user
+        const loginCred = req.body;
 
-    const isPasswordCorrect = await bcrypt.compare(loginCred.password, userInDb.password);
-    if (!isPasswordCorrect) {
-        errorResponse(res, 401, 'Password is incorrect');
-        return;
+        const isPasswordCorrect = await bcrypt.compare(loginCred.password, userInDb.password);
+        if (!isPasswordCorrect) {
+            throw appError(StatusCodes.UNAUTHORIZED, 'Password is incorrect')
+        }
+        next();
+    } catch (e) {
+        next(e)
     }
-    next();
 }
 
 export interface decodedToken extends JwtPayload {
@@ -63,26 +83,23 @@ export interface decodedToken extends JwtPayload {
 }
 
 export const tokenValidator = async (req: Request, res: Response, next: NextFunction) => {
-    const tokenWithBearer = req.headers.authorization;
-
-    if (!tokenWithBearer) {
-        errorResponse(res, 401, 'Token is required');
-        return;
-    }
-
-    const token = tokenWithBearer.split(' ')[1];
     try {
+        const tokenWithBearer = req.headers.authorization;
+
+        if (!tokenWithBearer) {
+            throw appError(StatusCodes.UNAUTHORIZED, 'Token is required');
+        }
+
+        const token = tokenWithBearer.split(' ')[1];
         const decodedToken = jwt.verify(token, envVars.JWTSECRET as string);
         if (!decodedToken) {
-            errorResponse(res, 401, 'Token is invalid');
-            return;
+            throw appError(StatusCodes.UNAUTHORIZED, 'Token is invalid');
         }
 
         let payload = decodedToken as decodedToken;
         res.locals.userId = payload.userId;
         next();
     } catch (e) {
-        errorResponse(res, 401, 'Token is invalid');
-        return;
+        next(e)
     }
 }
