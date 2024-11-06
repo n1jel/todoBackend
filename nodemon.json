@@ -1,0 +1,5 @@
+{
+  "watch": ["src"],
+  "ext": "ts",
+  "exec": "concurrently \"npx tsc --watch\" \"env $(cat .env) ts-node src/index.ts\""
+}
