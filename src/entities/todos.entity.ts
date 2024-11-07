@@ -6,6 +6,7 @@ const todoSchema = new mongoose.Schema(
         description: { type: String, required: true },
         isCompleted: { type: String, enum: ['0', '1', '2'], required: true, default: '0' },
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        endTime: { type: Date, required: true }
     },
     {
         timestamps: true
