@@ -3,6 +3,8 @@ import { appRoutes } from 'routes/app.route'
 import appError from './apperror.config'
 import errorHandler from 'middleware/errorhandling.middleware'
 
+const app: Express = express()
+
 export const initialiseMiddleware = (app: Express) => {
   // app.use(cors({ origin: '*' }))
   // app.use(morgan('dev'))
@@ -28,3 +30,9 @@ export const initializeRoutes = (app: Express) => {
 export const initializeErrorHandler = (app: Express) => {
   app.use(errorHandler)
 }
+
+initialiseMiddleware(app);
+initializeRoutes(app);
+initializeErrorHandler(app);
+
+export { app }

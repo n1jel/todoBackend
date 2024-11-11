@@ -53,3 +53,9 @@ This todo app is designed to handle all authentication-related operations within
    ```bash
    npm run start
    ```
+
+### Test
+
+```bash
+   npm run test
+```
