@@ -1,22 +1,27 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 const userSchema = new mongoose.Schema(
-    {
-        username: { type: String, required: [true, "Username is required"], trim: true, unique: true },
-        password: { type: String, required: true },
+  {
+    username: {
+      type: String,
+      required: [true, 'Username is required'],
+      trim: true,
+      unique: true
     },
-    {
-        timestamps: true
-    }
-);
+    password: { type: String, required: true }
+  },
+  {
+    timestamps: true
+  }
+)
 
 userSchema.set('toJSON', {
-    transform: (document, returnedObject) => {
-        delete returnedObject.__v
-        delete returnedObject.password
-    }
-});
+  transform: (document, returnedObject) => {
+    delete returnedObject.__v
+    delete returnedObject.password
+  }
+})
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema)
 
-export default User;
+export default User

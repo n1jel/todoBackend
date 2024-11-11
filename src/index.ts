@@ -1,7 +1,23 @@
-import errorHandler from "middleware/errorhandling.middleware";
-import app from "./config/express.config";
-import { appRoutes } from "./routes/app.route";
+import connectToDb from 'config/db.config'
+import {
+  initialiseMiddleware,
+  initializeErrorHandler,
+  initializeRoutes
+} from 'config/express.config'
+import express, { Express } from 'express'
+import { env } from 'process'
 
-app.use('/api/v1', appRoutes)
+const app: Express = express()
+const port = env.PORT || 3000
 
-app.use(errorHandler);
+connectToDb()
+
+initialiseMiddleware(app)
+
+initializeRoutes(app)
+
+initializeErrorHandler(app)
+
+app.listen(port, () => {
+  console.log(`[server]: Server is running at http://localhost:${port}`)
+})

@@ -1,9 +1,9 @@
-import * as dotenv from "dotenv";
+import * as dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 
 export const envVars = {
-    PORT: process.env.PORT,
-    DATABASEURI: process.env.MONGODB_URI,
-    JWTSECRET: process.env.JWT_SECRET
+  PORT: process.env.PORT,
+  DATABASEURI: process.env.MONGODB_URI,
+  JWTSECRET: process.env.JWT_SECRET
 }

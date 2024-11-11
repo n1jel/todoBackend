@@ -1,19 +1,30 @@
 import express, { Express, Request, Response } from 'express'
-import connectToDb from './db.config';
+import { appRoutes } from 'routes/app.route'
+import appError from './apperror.config'
+import errorHandler from 'middleware/errorhandling.middleware'
 
-const app: Express = express();
-const port = process.env.PORT || 3000;
+export const initialiseMiddleware = (app: Express) => {
+  // app.use(cors({ origin: '*' }))
+  // app.use(morgan('dev'))
+  app.use(express.json())
+  app.use(express.urlencoded({ extended: true }))
+}
 
-connectToDb();
+export const initializeRoutes = (app: Express) => {
+  //health check api use
+  app.get('/', (req: Request, res: Response) => {
+    res.send('MyTodo API is running')
+  })
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+  app.use('/api/v1', appRoutes)
 
-app.get("/", (req: Request, res: Response) => {
-    res.send("MyTodo");
-});
-app.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost:${port}`);
-});
+  app.all('*', () => {
+    const error = appError(404, 'Not found')
+    error.name = 'Not found'
+    throw error
+  })
+}
 
-export default app
+export const initializeErrorHandler = (app: Express) => {
+  app.use(errorHandler)
+}
