@@ -3,7 +3,6 @@ import request from 'supertest'
 
 describe('POST /api/v1/users/register', () => {
     it('should create a new user', async () => {
-        // console.log('test', app)
         const response = await request(app).post('/api/v1/auth/register').send({
             userName: 'John Doe',
             password: 'password123'
